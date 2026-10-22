@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f5eddf">
+<title>A Letter You Weren't Expecting</title>
+
+<style>
+:root {
+  --paper: #f8f1e5;
+  --paper-dark: #e9dcc7;
+  --ink: #493b32;
+  --muted: #8a7765;
+  --rose: #a76c69;
+  --gold: #b49a68;
+  --white: #fffaf1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at 15% 15%, #fffaf0 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 85%, #eadbc6 0%, transparent 45%),
+    var(--paper);
+  font-family: Georgia, "Times New Roman", serif;
+  overflow-x: hidden;
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 5px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.screen {
+  min-height: 100svh;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  isolation: isolate;
+}
+
+.screen::before,
+.screen::after {
+  content: "❧";
+  position: absolute;
+  color: #bba47c;
+  opacity: .48;
+  font-size: clamp(42px, 9vw, 76px);
+  pointer-events: none;
+}
+
+.screen::before {
+  top: 18px;
+  left: 15px;
+  transform: rotate(-35deg);
+}
+
+.screen::after {
+  bottom: 18px;
+  right: 15px;
+  transform: rotate(145deg);
+}
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+h1, h2, h3, p {
+  font-weight: normal;
+}
+
+h1 {
+  font-size: clamp(36px, 9vw, 68px);
+  line-height: 1.1;
+  max-width: 680px;
+  margin: 24px auto 18px;
+  font-style: italic;
+}
+
+h2 {
+  font-size: clamp(30px, 7vw, 48px);
+  line-height: 1.2;
+  margin: 15px 0;
+  font-style: italic;
+}
+
+h3 {
+  font-size: 23px;
+  font-style: italic;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.subtitle {
+  color: var(--muted);
+  max-width: 390px;
+  margin: 0 auto 28px;
+}
+
+.rule {
+  width: 90px;
+  height: 1px;
+  background: var(--gold);
+  margin: 24px auto;
+}
+
+.primary,
+.secondary {
+  border: 1px solid var(--gold);
+  background: rgba(255, 250, 241, .7);
+  color: var(--ink);
+  padding: 14px 23px;
+  cursor: pointer;
+  transition: .25s ease;
+  font-size: 13px;
+  letter-spacing: .8px;
+  max-width: 100%;
+}
+
+.primary:hover,
+.secondary:hover {
+  background: #eadbc6;
+  transform: translateY(-2px);
+}
+
+.primary:disabled {
+  opacity: .55;
+  cursor: default;
+  transform: none;
+}
+
+.small-note {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 20px;
+}
+
+.envelope-wrap {
+  width: min(280px, 75vw);
+  margin: 20px auto 25px;
+  cursor: pointer;
+  position: relative;
+  perspective: 800px;
+}
+
+.envelope {
+  height: 175px;
+  position: relative;
+  background: #dfc9a8;
+  box-shadow: 0 18px 38px #72583b24;
+  border: 1px solid #c5ad88;
+}
+
+.envelope::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, #f3e4cb, #d6bd98);
+  clip-path: polygon(0 0, 50% 56%, 100% 0);
+  transform-origin: top;
+  transition: transform .8s ease;
+  z-index: 3;
+}
+
+.envelope::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(35deg, #d4ba94, #f0dfc3);
+  clip-path: polygon(0 0, 50% 63%, 100% 0, 100% 100%, 0 100%);
+  z-index: 2;
+}
+
+.envelope-letter {
+  position: absolute;
+  left: 10%;
+  width: 80%;
+  height: 145px;
+  top: 15px;
+  padding: 18px 10px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 13px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .8s ease;
+  z-index: 1;
+}
+
+.seal {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--rose);
+  color: #fff3e7;
+  display: grid;
+  place-items: center;
+  left: calc(50% - 21px);
+  top: 67px;
+  z-index: 4;
+  box-shadow: 0 3px 10px #69433b33;
+  transition: opacity .3s ease;
+}
+
+.envelope-wrap.opened .envelope::before {
+  transform: rotateX(180deg);
+  z-index: 0;
+}
+
+.envelope-wrap.opened .envelope-letter {
+  transform: translateY(-95px);
+  z-index: 5;
+}
+
+.envelope-wrap.opened .seal {
+  opacity: 0;
+}
+
+#introMessage {
+  max-width: 420px;
+  animation: fadeIn .9s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.content-section {
+  width: min(680px, 100%);
+  margin: 0 auto;
+}
+
+.paper-card {
+  text-align: left;
+  padding: clamp(23px, 6vw, 44px);
+  background: rgba(255, 250, 241, .65);
+  border: 1px solid #d8c5a6;
+  box-shadow: 0 12px 35px #6c513015;
+  position: relative;
+}
+
+.paper-card::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid #d8c5a640;
+  pointer-events: none;
+}
+
+.paper-card p {
+  position: relative;
+  z-index: 1;
+}
+
+.signature {
+  font-style: italic;
+  color: var(--rose);
+  margin-top: 28px;
+}
+
+.diary {
+  width: min(680px, 100%);
+  margin: 20px auto;
+  background: #fff9ef;
+  border: 1px solid #d7c3a2;
+  box-shadow: 0 18px 45px #70533818;
+  padding: clamp(22px, 6vw, 48px);
+  position: relative;
+}
+
+.diary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 18px;
+  border-left: 1px solid #d9b7a7;
+  opacity: .7;
+}
+
+.diary-content {
+  text-align: left;
+  padding-left: 10px;
+  min-height: 230px;
+}
+
+.page-number {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+}
+
+.diary-content p {
+  white-space: pre-line;
+}
+
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.nav-row button {
+  padding: 11px 13px;
+  font-size: 12px;
+}
+
+.flower-button {
+  width: 130px;
+  height: 130px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 82px;
+  transition: transform .6s ease;
+}
+
+.flower-button:hover {
+  transform: rotate(12deg) scale(1.08);
+}
+
+.flower-message {
+  max-width: 430px;
+  animation: fadeIn .8s ease both;
+}
+
+.letter-card {
+  width: min(600px, 100%);
+  background: #fff9ee;
+  border: 1px solid #d6c09b;
+  box-shadow: 0 12px 40px #70533820;
+  padding: 24px;
+  margin: 24px auto;
+}
+
+.letter-seal {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--rose);
+  color: white;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+}
+
+#letterText {
+  text-align: left;
+  white-space: pre-line;
+  animation: fadeIn .8s ease both;
+}
+
+.archive-box {
+  width: min(410px, 90%);
+  margin: 25px auto;
+  padding: 27px 20px;
+  background: #e7d5b8;
+  border: 1px solid #c6ad86;
+  box-shadow: 0 12px 30px #70533818;
+  cursor: pointer;
+  transition: transform .3s ease;
+}
+
+.archive-box:hover {
+  transform: translateY(-4px);
+}
+
+.archive-box .box-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.footer-mark {
+  margin-top: 25px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.final-flower {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 480px) {
+  .screen {
+    padding: 25px 17px;
+  }
+
+  .screen::before {
+    left: 8px;
+    top: 8px;
+  }
+
+  .screen::after {
+    right: 8px;
+    bottom: 8px;
+  }
+
+  .nav-row {
+    flex-wrap: wrap;
+  }
+
+  .nav-row button {
+    flex: 1;
+  }
+
+  p {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SCENE 1: THE MYSTERIOUS LETTER -->
+<main id="opening" class="screen">
+  <div class="eyebrow">A small collection of remembered things</div>
+
+  <h1>A Letter You Weren't Expecting</h1>
+
+  <p class="subtitle">
+    For someone who crossed my mind today…
+  </p>
+
+  <div
+    id="envelope"
+    class="envelope-wrap"
+    role="button"
+    tabindex="0"
+    aria-label="Open the mysterious envelope"
+  >
+    <div class="envelope">
+      <div class="envelope-letter">
+        A little something, just for you.
+      </div>
+      <div class="seal">✿</div>
+    </div>
+  </div>
+
+  <button id="openButton" class="primary">
+    ✉ Open your letter
+  </button>
+
+  <p class="small-note">No occasion needed. Just a little thought.</p>
+
+  <div id="introMessage" class="hidden">
+    <div class="rule"></div>
+    <p>
+      Dear Arpita,<br><br>
+      There wasn't a birthday, an anniversary, or any special occasion today.
+      I simply thought of you.<br><br>
+      And somehow, that was enough reason to make this little something for you.
+    </p>
+    <button id="beginButton" class="primary">Turn the page →</button>
+  </div>
+</main>
+
+<!-- SCENE 2: THE ARCHIVE -->
+<section id="archive" class="screen hidden">
+  <div class="eyebrow">A little collection, made with care</div>
+  <h2>The Little Archive of Us</h2>
+  <p class="subtitle">
+    Not a story about perfect days. A collection of memories,
+    little things, and a friendship still being written.
+  </p>
+
+  <div class="content-section">
+    <div class="diary">
+      <div class="diary-content" aria-live="polite">
+        <div id="pageNumber" class="page-number">PAGE 01</div>
+        <h3 id="pageTitle">The Beginning</h3>
+        <p id="pageText"></p>
+      </div>
+
+      <div class="nav-row">
+        <button id="prevPage" class="secondary">← Previous</button>
+        <button id="nextPage" class="primary">Next page →</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="small-note">Take your time. There is no rush to turn the pages.</p>
+</section>
+
+<!-- SCENE 3: THE FLOWER -->
+<section id="flowerScene" class="screen hidden">
+  <div class="eyebrow">A little thought to keep</div>
+  <h2>Some Things Stay</h2>
+
+  <p class="subtitle">
+    Some things are beautiful even before they bloom.
+    Tap the flower to discover yours.
+  </p>
+
+  <button id="flowerButton" class="flower-button" aria-label="Open the flower">
+    🌷
+  </button>
+
+  <div id="flowerMessage" class="flower-message hidden">
+    <div class="rule"></div>
+    <p>
+      People grow, change, and follow different paths.
+      But the kindness and happiness they bring into our lives
+      can remain with us for a long time.
+    </p>
+    <p><em>I'm glad our paths crossed, Arpita.</em></p>
+    <button id="flowerNext" class="primary">Continue →</button>
+  </div>
+</section>
+
+<!-- SCENE 4: HER HANDWRITTEN MESSAGE -->
+<section id="noteScene" class="screen hidden">
+  <div class="eyebrow">A little note worth keeping</div>
+  <h2>The Words I Remember</h2>
+
+  <p class="subtitle">
+    Some words become special because of the person who wrote them.
+  </p>
+
+  <div class="paper-card content-section">
+    <p style="font-size:12px;letter-spacing:2px;color:#8a7765">
+      A NOTE I REMEMBER
+    </p>
+
+    <p style="font-style:italic;font-size:22px">
+      "Miss you dear."
+    </p>
+
+    <div class="rule" style="margin-left:0"></div>
+
+    <p style="font-style:italic">
+      "I hope our friendship never ends."
+    </p>
+
+    <div class="rule" style="margin-left:0"></div>
+
+    <p style="font-size:19px;font-style:italic">
+      Arpita + Pritimayee = best friendship.
+    </p>
+
+    <p class="signature">— A little piece of our story 🤍</p>
+  </div>
+
+  <button id="noteNext" class="primary">There's another letter →</button>
+  <p class="small-note">
+    Made from the words you've shared with me.
+  </p>
+</section>
+
+<!-- SCENE 5: A PERSONAL LETTER -->
+<section id="letterScene" class="screen hidden">
+  <div class="eyebrow">For an ordinary day</div>
+  <h2>A Letter Just for You</h2>
+
+  <p class="subtitle">
+    A little reminder that your friendship is appreciated.
+  </p>
+
+  <div class="letter-card">
+    <div class="letter-seal">✿</div>
+    <p id="letterText"></p>
+  </div>
+
+  <button id="letterNext" class="primary">Keep going →</button>
+</section>
+
+<!-- SCENE 6: THE FUTURE TIME CAPSULE -->
+<section id="futureScene" class="screen hidden">
+  <div class="eyebrow">To be opened by the people we become</div>
+  <h2>The Pages Ahead</h2>
+
+  <p class="subtitle">
+    A little message for a day we haven't reached yet.
+  </p>
+
+  <button id="capsuleButton" class="archive-box">
+    <div class="box-icon">📜</div>
+    <div class="eyebrow">A letter to our future selves</div>
+    <p>Tap to open the time capsule</p>
+  </button>
+
+  <div id="futureMessage" class="paper-card content-section hidden">
+    <p>Dear future Arpita and Pritimayee,</p>
+
+    <p>
+      I wonder where life has taken us.
+      Perhaps we've changed more than we can imagine today.
+      Perhaps our days are filled with different people, places, and dreams.
+    </p>
+
+    <p>
+      But I hope we still remember the girls we were,
+      the days we shared, and the little things that once made us smile.
+    </p>
+
+    <p>
+      Whatever the future looks like, I hope it is kind to both of us.
+    </p>
+
+    <p class="signature">A little wish from the past 🤍</p>
+
+    <button id="futureNext" class="primary">One last page →</button>
+  </div>
+</section>
+
+<!-- SCENE 7: THE FINAL REVEAL -->
+<section id="finalScene" class="screen hidden">
+  <div class="final-flower">❀</div>
+  <div class="eyebrow">A note from me to you</div>
+
+  <h2>Our Story Is Still Being Written</h2>
+
+  <div class="rule"></div>
+
+  <div class="content-section">
+    <p>
+      This little archive was made because someone crossed my mind today.
+    </p>
+
+    <p>
+      That someone was you.
+    </p>
+
+    <p style="font-style:italic;font-size:21px">
+      We may not share every day, but I'm glad we share a story.
+    </p>
+
+    <p>
+      Thank you for being a part of mine, Arpita.
+    </p>
+
+    <p class="signature">
+      With warm thoughts,<br>
+      Pritimayee 🤍
+    </p>
+  </div>
+
+  <div class="rule"></div>
+
+  <button id="restartButton" class="primary">Read it again ↺</button>
+
+  <div class="footer-mark">A LITTLE ARCHIVE OF US · MADE WITH CARE</div>
+</section>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const scenes = [
+  "opening",
+  "archive",
+  "flowerScene",
+  "noteScene",
+  "letterScene",
+  "futureScene",
+  "finalScene"
+];
+
+function showScene(id) {
+  scenes.forEach(sceneId => {
+    $(sceneId).classList.toggle("hidden", sceneId !== id);
+  });
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+let envelopeOpened = false;
+
+function openEnvelope() {
+  if (envelopeOpened) return;
+
+  envelopeOpened = true;
+  $("envelope").classList.add("opened");
+  $("openButton").classList.add("hidden");
+
+  window.setTimeout(() => {
+    $("introMessage").classList.remove("hidden");
+  }, 650);
+}
+
+$("openButton").addEventListener("click", openEnvelope);
+$("envelope").addEventListener("click", openEnvelope);
+
+$("envelope").addEventListener("keydown", event => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    openEnvelope();
+  }
+});
+
+$("beginButton").addEventListener("click", () => {
+  showScene("archive");
+});
+
+const pages = [
+  {
+    title: "The Beginning",
+    text:
+`Every friendship has a beginning.
+
+Somehow, two people meet, share ordinary days, and gradually become part of each other's stories.
+
+I'm glad our story began, Arpita.
+
+And I'm glad I still have memories of it to carry with me.`
+  },
+  {
+    title: "The Little Things",
+    text:
+`It's funny how the smallest things can become meaningful.
+
+A conversation. A shared laugh. An ordinary school day that we didn't know we might miss someday.
+
+We don't always realise when a moment is becoming a memory.
+
+Perhaps that's why the little things deserve a little appreciation.`
+  },
+  {
+    title: "The Words I Kept",
+    text:
+`There are some words we remember because they came from someone who mattered.
+
+Your message about our friendship is one of those little things.
+
+I wanted to give those words a place here, so they could be revisited whenever you felt like remembering them.
+
+Some messages deserve more than a passing glance.`
+  },
+  {
+    title: "The Pages Ahead",
+    text:
+`Life gets busy. People grow. New chapters begin.
+
+We may not always have the same amount of time to share, but I hope we continue cheering for each other and wishing good things for one another.
+
+There are still so many pages ahead.
+
+And I hope yours are filled with happiness, courage, and beautiful surprises.`
+  }
+];
+
+let pageIndex = 0;
+
+function renderPage() {
+  const page = pages[pageIndex];
+
+  $("pageNumber").textContent =
+    "PAGE " + String(pageIndex + 1).padStart(2, "0");
+
+  $("pageTitle").textContent = page.title;
+  $("pageText").textContent = page.text;
+
+  $("prevPage").disabled = pageIndex === 0;
+
+  $("nextPage").textContent =
+    pageIndex === pages.length - 1
+      ? "Discover something →"
+      : "Next page →";
+}
+
+$("prevPage").addEventListener("click", () => {
+  if (pageIndex > 0) {
+    pageIndex--;
+    renderPage();
+  }
+});
+
+$("nextPage").addEventListener("click", () => {
+  if (pageIndex < pages.length - 1) {
+    pageIndex++;
+    renderPage();
+  } else {
+    showScene("flowerScene");
+  }
+});
+
+renderPage();
+
+$("flowerButton").addEventListener("click", () => {
+if (!$("flowerMessage").classList.contains("hidden")) return;
+
+$("flowerButton").textContent = "🌸";
+$("flowerButton").style.transform = "rotate(20deg) scale(1.15)";
+$("flowerMessage").classList.remove("hidden");
+});
+
+$("flowerNext").addEventListener("click", () => {
+  showScene("noteScene");
+});
+
+$("noteNext").addEventListener("click", () => {
+  showScene("letterScene");
+});
+
+$("letterText").textContent =
+`Dear Arpita,
+
+I just wanted to tell you that I'm glad you're a part of my story.
+
+Even when we don't meet as often, I still appreciate the friendship and memories we share.
+
+I hope life brings you wonderful opportunities, kind people, reasons to laugh, and the courage to believe in yourself.
+
+Thank you for the conversations, the memories, and the little things that became part of our friendship.
+
+You don't need to do anything special with this letter. I simply wanted you to have it.
+
+Whenever you come across this little page, I hope it brings a smile to your face.
+
+Take care of yourself, always.
+
+With warm thoughts,
+Pritimayee 🤍`;
+
+$("letterNext").addEventListener("click", () => {
+  showScene("futureScene");
+});
+
+let capsuleOpened = false;
+
+$("capsuleButton").addEventListener("click", () => {
+  if (capsuleOpened) return;
+
+  capsuleOpened = true;
+  $("futureMessage").classList.remove("hidden");
+  $("capsuleButton").textContent = "Time capsule opened ✓";
+  $("capsuleButton").disabled = true;
+  $("capsuleButton").style.cursor = "default";
+});
+
+$("futureNext").addEventListener("click", () => {
+  showScene("finalScene");
+});
+
+$("restartButton").addEventListener("click", () => {
+  envelopeOpened = false;
+  pageIndex = 0;
+  capsuleOpened = false;
+
+  $("envelope").classList.remove("opened");
+  $("openButton").classList.remove("hidden");
+  $("introMessage").classList.add("hidden");
+
+  $("flowerButton").textContent = "🌷";
+  $("flowerButton").style.transform = "";
+  $("flowerMessage").classList.add("hidden");
+
+  $("futureMessage").classList.add("hidden");
+  $("capsuleButton").disabled = false;
+
+  $("capsuleButton").innerHTML =
+    '<div class="box-icon">📜</div>' +
+    '<div class="eyebrow">A letter to our future selves</div>' +
+    '<p>Tap to open the time capsule</p>';
+
+  renderPage();
+  showScene("opening");
+});
+</script>
+
+</body>
+  </html>
